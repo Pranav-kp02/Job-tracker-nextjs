@@ -6,10 +6,10 @@ import { Button } from "./ui/button";
 const Navbar = () => {
   return (
     <nav className="border-b border-gray-200 bg-white">
-      <div className="container mx-auto flex h-16 item-center px-4 justify-between">
+      <div className="container mx-auto flex h-16 items-center px-4 justify-between">
         <Link
           href="/"
-          className="flex item-center gap-2 text-xl semi-bold text-primary"
+          className="flex item-center gap-2 text-xl font-semibold text-primary"
         >
           <Briefcase />
           job Tracker
