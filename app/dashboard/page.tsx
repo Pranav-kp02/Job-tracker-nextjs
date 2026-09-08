@@ -19,9 +19,11 @@ const Dashboard = async () => {
     name: "Job hunt",
   }).populate({
     path: "columns",
+    populate: {
+      path: "jobApplications",
+    },
   });
 
-  console.log("board", board);
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto p-6">

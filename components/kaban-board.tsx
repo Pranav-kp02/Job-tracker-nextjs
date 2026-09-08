@@ -1,6 +1,6 @@
 "use client";
 
-import { Board, column } from "@/lib/models/models.type";
+import { Board, column, JobApplication } from "@/lib/models/models.type";
 import {
   Award,
   Calendar,
@@ -21,6 +21,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import CreateJobApplicationDialog from "./CreateJobApplicationDialog";
+import JobApplicationCard from "./job-application-card";
 
 interface KabanBoardProps {
   board: Board;
@@ -58,12 +59,16 @@ const COL_CONFIG: Array<colConfig> = [
 function DropAbleColumn({
   column,
   config,
-  boardId,
+  boradId,
+  sortedColumns,
 }: {
   column: column;
   config: colConfig;
   boardId: string;
+  sortedColumns: column[];
 }) {
+  const sortedJobs =
+    column.jobApplications?.sort((a, b) => a.order - b.order) || [];
   return (
     <Card className="min-w-[300] flex-shrink-0 rounded-lg shadow-md p-0">
       <CardHeader className={`${config.color} text-white  pb-3 pt-3`}>
@@ -75,14 +80,16 @@ function DropAbleColumn({
             </CardTitle>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-white hover:bg-white/20"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-white hover:bg-white/20"
+                />
+              }
+            >
+              <MoreVertical className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem className="text-destructive">
@@ -95,14 +102,33 @@ function DropAbleColumn({
       </CardHeader>
 
       <CardContent className="space-y-2 pt-4 bg-gray-50/50 min-h-[400px] rounded-b-lg">
-        <CreateJobApplicationDialog columnId={column._id} boardId={boardId} />
+        {sortedJobs.map((job, k) => (
+          <SortableJobCard
+            key={k}
+            job={{ ...job, columnId: job.columnId || column._id }}
+            columns={sortedColumns}
+          />
+        ))}
+        <CreateJobApplicationDialog columnId={column._id} boardId={boradId} />
       </CardContent>
     </Card>
   );
 }
 
+function SortableJobCard({
+  job,
+  columns,
+}: {
+  job: JobApplication;
+  columns: column[];
+}) {
+  return <JobApplicationCard job={job} columns={columns} />;
+}
+
 const KabanBoard = ({ board, userId }: KabanBoardProps) => {
   const columns = board.columns;
+  console.log("first", columns[0].jobApplications);
+  const sortedColumn = columns.sort((a, b) => a.order - b.order) || [];
   return (
     <>
       <div>
@@ -117,7 +143,8 @@ const KabanBoard = ({ board, userId }: KabanBoardProps) => {
                 key={key}
                 column={col}
                 config={config}
-                boradId={board._id}
+                boradId={board?._id}
+                sortedColumns={sortedColumn}
               />
             );
           })}
